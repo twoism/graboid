@@ -179,7 +179,6 @@ describe Graboid::Entity do
     end
     
     it "should return 2 WorkingPosts" do
-      puts WorkingPost.all.first
       WorkingPost.all.length.should == 2
     end
     
