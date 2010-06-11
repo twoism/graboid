@@ -4,6 +4,11 @@
 
   Simply awesome web scraping. Better docs later. See specs.
 
+### Installation ###
+
+
+    gem install graboid
+
 
 ### Usage ###
 
