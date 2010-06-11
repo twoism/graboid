@@ -12,9 +12,6 @@
 
 ### Usage ###
 
-
-##### Simple Extraction with clean markup #####
-
     %w{rubygems graboid}.each { |f| require f }
 
     class RedditEntry
