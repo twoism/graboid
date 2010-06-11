@@ -2,8 +2,78 @@
 
 ![Graboid](https://github.com/twoism/graboid/raw/master/spec/fixtures/graboid.jpg "Graboid")
 
-  Simply awesome web scraping.
+  Simply awesome web scraping. Better docs later. See specs.
 
+
+### Usage ###
+
+
+##### Simple Extraction with clean markup #####
+
+    <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+       "http://www.w3.org/TR/html4/strict.dtd">
+
+    <html lang="en">
+    <head>
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    	<title>posts</title>
+    	<meta name="generator" content="TextMate http://macromates.com/">
+    	<meta name="author" content="Posterous">
+    	<!-- Date: 2010-06-10 -->
+    </head>
+    <body>
+
+      <div class="post" id="1">
+
+        <p class="title">Post 1</p>
+
+        <p class="body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
+          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
+          ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
+          in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
+          non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+        <span class="author">Someone Awesome (06/11/2010)</span>
+
+      </div>
+
+      <div class="post" id="2">
+
+        <p class="title">Post 2</p>
+
+        <p class="body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
+          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation 
+          ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
+          in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
+          non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+        <span class="author">Someone Awesome (06/11/2010)</span>
+
+      </div>
+
+    </body>
+    </html>
+    
+  To extract the Posts use:
+  
+    class Post
+      include Graboid::Entity
+      
+      field :title
+      field :body
+      field :author
+      field :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
+    end
+    
+    Post.source = 'The HTML string or URL to the document'
+    
+    @post = Post.all.first
+    
+    puts @post.date
+    => 06/11/2010
+    
+    puts @post.title
+    => Post 1
 
 ##Note on Patches/Pull Requests
  
