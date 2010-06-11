@@ -7,7 +7,7 @@
 ### Installation ###
 
 
-    gem install graboid
+    gem install nokogiri graboid
 
 
 ### Usage ###
