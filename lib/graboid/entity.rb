@@ -53,8 +53,6 @@ module Graboid
       def hash_map fragment
         attribute_map.inject({}) do |extracted_hash, at| 
           selector, processor       = at.last[:selector], at.last[:processor]
-          
-
           extracted_hash[at.first]  = processor.nil? ? fragment.css(selector).first.text : processor.call(fragment.css(selector).first) rescue ""
 
           extracted_hash

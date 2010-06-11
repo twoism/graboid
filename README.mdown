@@ -18,9 +18,12 @@
       include Graboid::Entity
 
       root '.entry'
+      
       field :title
       field :domain, :selector => '.domain a'
-      field :link, :selector => '.title', :processor => lambda { |entry| entry.css('a').first['href'] }
+      field :link,    :selector => '.title' do |entry| 
+        entry.css('a').first['href'] 
+      end
 
     end
 
