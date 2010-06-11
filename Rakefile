@@ -5,12 +5,14 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "graboid"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{web scraping made easy}
+    gem.description = %Q{web scraping made easier}
     gem.email = "signalstatic@gmail.com"
     gem.homepage = "http://github.com/twoism/graboid"
     gem.authors = ["Christopher Burnett"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_dependency "nokogiri"
+    gem.add_dependency "active_support"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
