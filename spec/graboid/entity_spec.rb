@@ -112,8 +112,15 @@ describe Graboid::Entity do
   
   describe "#all_fragments" do
     before(:each) do
-      Post.source = POSTS_HTML_STR
-      @fragments  = Post.all_fragments
+      
+      class WorkingPost
+        include Graboid::Entity
+        root '.post'
+        field :body
+      end
+
+      WorkingPost.source = POSTS_HTML_STR
+      @fragments  = WorkingPost.all_fragments
     end
     
     it "should return the NodeSet" do
@@ -122,6 +129,57 @@ describe Graboid::Entity do
     
     it "should have 2 results" do
       @fragments.count.should == 2
+    end
+    
+  end
+  
+  describe "#extract_instance" do
+    
+    before(:each) do
+      class WorkingPost
+        include Graboid::Entity
+        root '.post'
+        field :title
+        field :body
+        field :author
+        field :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
+      end
+      
+      @instance = WorkingPost.extract_instance(POST_FRAGMENT)
+      
+    end
+    
+    it "should return a WorkingPost instance" do
+      @instance.should be_a WorkingPost
+    end
+    
+    it "should respond to attrs defined in the map" do
+      WorkingPost.attribute_map.each { |k,v| @instance.should respond_to(k)  }
+    end
+    
+    it "should extract the date" do
+      @instance.date.should == '06/11/2010'
+    end
+    
+  end
+  
+  describe "#all" do
+    before(:each) do
+      class WorkingPost
+        include Graboid::Entity
+        root '.post'
+        field :title
+        field :body
+        field :author
+        field :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
+      end
+      
+      WorkingPost.source = POSTS_HTML_STR
+      
+    end
+    
+    it "should return 2 WorkingPosts" do
+      WorkingPost.all.length.should == 2
     end
     
   end

@@ -31,7 +31,7 @@ module Graboid
       end
       
       def root_selector
-        @root_selector ||= inferred_selector
+        @root_selector || inferred_selector
       end
       
       def inferred_selector
@@ -47,11 +47,23 @@ module Graboid
       end
       
       def extract_instance fragment
-        attribute_map.each{|k| puts k.first[:selector]  }
+        new(hash_map(fragment))
+      end
+      
+      def hash_map fragment
+        attribute_map.inject({}) do |extracted_hash, at| 
+          selector, processor       = at.last[:selector], at.last[:processor]
+          extracted_hash[at.first]  = processor.nil? ? fragment.css(selector).first.text : processor.call(fragment.css(selector).first)
+          extracted_hash
+        end
       end
       
       def all_fragments
-        doc.css(root_selector).each {|e|  extract_instance e }
+        doc.css root_selector
+      end
+      
+      def all
+        all_fragments.collect{ |frag| extract_instance(frag) }
       end
       
       def read_source
@@ -66,6 +78,17 @@ module Graboid
     end # ClassMethods
     
     module InstanceMethods
+      
+      def initialize opts={}
+        opts.each do |k,v|
+          self.class_eval do
+            define_method k do
+              v
+            end
+          end
+        end
+      end
+      
       def attribute_map
         self.class.attribute_map
       end

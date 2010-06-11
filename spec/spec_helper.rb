@@ -10,3 +10,5 @@ end
 
 file_path       = File.expand_path(File.dirname(__FILE__)+'/fixtures/posts.html')
 POSTS_HTML_STR  = File.read(file_path){|f| f.read }
+d = Nokogiri::HTML(POSTS_HTML_STR)
+POST_FRAGMENT   = Nokogiri::HTML::fragment(d.css('.post').first.to_html)
