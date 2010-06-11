@@ -1,4 +1,4 @@
-%w{rubygems nokogiri active_support}.each { |f| require f }
+%w{rubygems nokogiri open-uri active_support}.each { |f| require f }
 
 module Graboid
   require 'graboid/entity'
