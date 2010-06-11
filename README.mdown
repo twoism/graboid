@@ -1,6 +1,6 @@
 ### Graboid ###
 
-![Graboid](https://github.com/twoism/graboid/raw/master/spec/fixtures/graboid.jpg "Graboid")
+![Graboid](http://github.com/twoism/graboid/raw/master/spec/fixtures/graboid.jpg "Graboid")
 
   Simply awesome web scraping. Better docs later. See specs.
 
