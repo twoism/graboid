@@ -64,24 +64,64 @@ module Graboid
       end
       
       def all_fragments
-        doc.css root_selector
+        return page_fragments if @pager.nil?
+        old_source  = self.source
+        @collection = []
+        while next_page?
+          @frags = page_fragments
+          @collection += @frags
+          paginate
+        end
+        self.source = old_source
+        @collection
+      end
+      
+      def paginate
+        next_page_url = @pager.call(doc) rescue nil
+        self.source   = next_page_url
+        self.current_page += 1
+      end
+      
+      def next_page?
+        (current_page <= max_pages-1)
+      end
+      
+      def page_fragments
+        doc.css(root_selector)
       end
       
       def all opts={}
+        self.max_pages = opts[:max_pages] if opts[:max_pages].present?
         all_fragments.collect{ |frag| extract_instance(frag) }
       end
       
       def read_source
-        case source
+        case self.source
           when /^http:\/\//
-            open source
+            open self.source
           when String
-            source
+            self.source
         end
       end
       
       def pager &block
         @pager = block
+      end
+      
+      def max_pages
+        @max_pages ||= 0
+      end
+      
+      def max_pages=num
+        @max_pages = num
+      end
+      
+      def current_page
+        @current_page ||= 0
+      end
+      
+      def current_page=num
+        @current_page = num
       end
       
     end # ClassMethods

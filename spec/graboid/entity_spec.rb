@@ -184,31 +184,44 @@ describe Graboid::Entity do
     
   end
   
-  # describe "#pager" do
-  #     before(:each) do
-  # 
-  #       class DiggPost
-  #         include Graboid::Entity
-  #         selector '.news-summary'
-  #         set :title, :selector => '.news-body h3'
-  #         
-  #         pager do |doc|
-  #           url = doc.css('a.nextprev').select{|e| e.text == 'Next'  }.first['href'] rescue nil
-  #           url = "http://digg.com#{url}" if url
-  #           url
-  #         end
-  #       end
-  # 
-  #       DiggPost.source = 'http://digg.com/'
-  #       @posts = DiggPost.all(10)
-  #     end
-  #     it "should" do
-  #       @posts.each do |p|
-  #         puts p.title
-  #       end
-  #       puts @posts.length
-  #     end
-  #   end
+  [:current_page, :max_pages].each do |m|
+    describe "##{m}" do
+      it "should be 0 by default" do
+        Post.send(m).should == 0
+      end
+      it "should be 3" do
+        Post.send("#{m}=",3)
+        Post.send(m).should == 3
+      end
+    end
+  end
+  
+  describe "#pager" do
+    before(:each) do
+
+      class RedditEntry
+        include Graboid::Entity
+
+        selector '.entry'
+
+        set :title
+        set :domain, :selector => '.domain a'
+        set :link,   :selector => '.title' do |entry| 
+          entry.css('a').first['href'] 
+        end
+        
+        pager do |doc|
+          doc.css('p.nextprev a').select{|a| a.text =~ /next/i  }.first['href']
+        end
+
+      end
+      RedditEntry.source = 'http://reddit.com'
+      @posts = RedditEntry.all(:max_pages => 2)
+    end
+    it "should get 70 posts" do
+      @posts.length.should == 70
+    end
+  end
   
   
 end
