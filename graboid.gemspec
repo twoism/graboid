@@ -14,7 +14,8 @@ Gem::Specification.new do |s|
   s.email = %q{signalstatic@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.mdown"
+     "README.mdown",
+     "README.mdown.orig"
   ]
   s.files = [
     ".document",
