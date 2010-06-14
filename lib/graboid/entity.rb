@@ -14,22 +14,26 @@ module Graboid
       def source
         @source
       end
-
+      
       def source=(src)
         @source = src
       end
       
-      def field name, opts={}, &block
+      def set name, opts={}, &block
         opts.merge!(:selector   => ".#{name}")  unless opts[:selector].present?
         opts.merge!(:processor  => block)       if block_given?
         
         attribute_map[name] = opts
       end
       
-      def root selector
+      alias_method :field, :set
+      
+      def selector selector
         @root_selector = selector
       end
-      
+            
+      alias_method :root, :selector
+
       def root_selector
         @root_selector || inferred_selector
       end
@@ -63,17 +67,21 @@ module Graboid
         doc.css root_selector
       end
       
-      def all
+      def all opts={}
         all_fragments.collect{ |frag| extract_instance(frag) }
       end
       
       def read_source
-        case @source
+        case source
           when /^http:\/\//
-            open @source
+            open source
           when String
-            @source
+            source
         end
+      end
+      
+      def pager &block
+        @pager = block
       end
       
     end # ClassMethods
