@@ -17,7 +17,7 @@
     class RedditEntry
       include Graboid::Entity
 
-      root '.entry'
+      selector '.entry'
       
       field :title
       field :domain, :selector => '.domain a'

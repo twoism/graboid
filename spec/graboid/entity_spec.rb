@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 class Post
   include Graboid::Entity
   
-  root '.post'
+  selector '.post'
 end
 
 describe Graboid::Entity do
@@ -12,7 +12,7 @@ describe Graboid::Entity do
       before(:each) do
         Post.source = 'http://foo.com/'
       end
-
+  
       it "should set the source" do
         Post.source.should == 'http://foo.com/'
       end
@@ -65,11 +65,11 @@ describe Graboid::Entity do
   
   end
   
-  describe "#field" do
+  describe "#set" do
     describe "simple syntax" do
       
       before(:each) do
-        Post.field :body
+        Post.set :body
       end
       
       it "should be set in the attr map" do
@@ -83,7 +83,7 @@ describe Graboid::Entity do
     
     describe "custom selector syntax" do
       before(:each) do
-        Post.field :body, :selector => '.custom'
+        Post.set :body, :selector => '.custom'
       end
       
       it "should set the selector" do
@@ -94,7 +94,7 @@ describe Graboid::Entity do
     describe "custom selector syntax with a lambda" do
       
       before(:each) do
-        Post.field :body, :selector => '.custom' do |item|
+        Post.set :body, :selector => '.custom' do |item|
           "from lambda"
         end
       end
@@ -115,10 +115,10 @@ describe Graboid::Entity do
       
       class WorkingPost
         include Graboid::Entity
-        root '.post'
-        field :body
+        selector '.post'
+        set :body
       end
-
+  
       WorkingPost.source = POSTS_HTML_STR
       @fragments  = WorkingPost.all_fragments
     end
@@ -138,11 +138,11 @@ describe Graboid::Entity do
     before(:each) do
       class WorkingPost
         include Graboid::Entity
-        root '.post'
-        field :title
-        field :body
-        field :author
-        field :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
+        selector '.post'
+        set :title
+        set :body
+        set :author
+        set :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
       end
       
       @instance = WorkingPost.extract_instance(POST_FRAGMENT)
@@ -167,11 +167,11 @@ describe Graboid::Entity do
     before(:each) do
       class WorkingPost
         include Graboid::Entity
-        root '.post'
-        field :title
-        field :body
-        field :author
-        field :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
+        selector '.post'
+        set :title
+        set :body
+        set :author
+        set :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
       end
       
       WorkingPost.source = POSTS_HTML_STR
@@ -183,5 +183,32 @@ describe Graboid::Entity do
     end
     
   end
+  
+  # describe "#pager" do
+  #     before(:each) do
+  # 
+  #       class DiggPost
+  #         include Graboid::Entity
+  #         selector '.news-summary'
+  #         set :title, :selector => '.news-body h3'
+  #         
+  #         pager do |doc|
+  #           url = doc.css('a.nextprev').select{|e| e.text == 'Next'  }.first['href'] rescue nil
+  #           url = "http://digg.com#{url}" if url
+  #           url
+  #         end
+  #       end
+  # 
+  #       DiggPost.source = 'http://digg.com/'
+  #       @posts = DiggPost.all(10)
+  #     end
+  #     it "should" do
+  #       @posts.each do |p|
+  #         puts p.title
+  #       end
+  #       puts @posts.length
+  #     end
+  #   end
+  
   
 end
