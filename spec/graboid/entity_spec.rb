@@ -1,11 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class Post
-  include Graboid::Entity
-  
-  selector '.post'
-end
-
 describe Graboid::Entity do
   describe "#source" do
     describe "when url" do
@@ -112,12 +106,6 @@ describe Graboid::Entity do
   
   describe "#all_fragments" do
     before(:each) do
-      
-      class WorkingPost
-        include Graboid::Entity
-        selector '.post'
-        set :body
-      end
   
       WorkingPost.source = POSTS_HTML_STR
       @fragments  = WorkingPost.all_fragments
@@ -136,17 +124,7 @@ describe Graboid::Entity do
   describe "#extract_instance" do
     
     before(:each) do
-      class WorkingPost
-        include Graboid::Entity
-        selector '.post'
-        set :title
-        set :body
-        set :author
-        set :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
-      end
-      
       @instance = WorkingPost.extract_instance(POST_FRAGMENT)
-      
     end
     
     it "should return a WorkingPost instance" do
@@ -196,31 +174,18 @@ describe Graboid::Entity do
     end
   end
   
-  describe "#pager" do
-    before(:each) do
-
-      class RedditEntry
-        include Graboid::Entity
-
-        selector '.entry'
-
-        set :title
-        set :domain, :selector => '.domain a'
-        set :link,   :selector => '.title' do |entry| 
-          entry.css('a').first['href'] 
-        end
-        
-        pager do |doc|
-          doc.css('p.nextprev a').select{|a| a.text =~ /next/i  }.first['href']
-        end
-
+  if ENV['GRABOID_EXT']
+  
+    describe "#pager" do
+      before(:each) do
+        RedditEntry.source = 'http://reddit.com'
+        @posts = RedditEntry.all(:max_pages => 2)
       end
-      RedditEntry.source = 'http://reddit.com'
-      @posts = RedditEntry.all(:max_pages => 2)
+      it "should get 70 posts" do
+        @posts.length.should == 70
+      end
     end
-    it "should get 70 posts" do
-      @posts.length.should == 70
-    end
+    
   end
   
   

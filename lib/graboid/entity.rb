@@ -51,6 +51,7 @@ module Graboid
       end
       
       def extract_instance fragment
+        run_extract_callbacks
         new(hash_map(fragment))
       end
       
@@ -68,8 +69,8 @@ module Graboid
         old_source  = self.source
         @collection = []
         while next_page?
-          @frags = page_fragments
-          @collection += @frags
+          @collection += page_fragments
+          run_pagination_callbacks
           paginate
         end
         self.source = old_source
@@ -123,6 +124,25 @@ module Graboid
       def current_page=num
         @current_page = num
       end
+      
+      def run_pagination_callbacks
+        self.class_eval { @before_paginate.call } if @before_paginate
+      end
+      
+      def run_extract_callbacks
+        self.class_eval { @before_extract_instance.call } if @before_extract_instance
+      end
+      
+      instance_eval do
+        [:before, :after].each do |prefix|
+          [:paginate, :extract].each do |suffix|
+            method_name = "#{prefix}_#{suffix}"
+            define_method "#{prefix}_#{suffix}" do |&block|
+              instance_variable_set "@#{method_name}", block
+            end
+          end
+        end 
+      end     
       
     end # ClassMethods
     
