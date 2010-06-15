@@ -21,26 +21,30 @@
 
       set :title
       set :domain, :selector => '.domain a'
+      
       set :link,   :selector => '.title' do |entry| 
         entry.css('a').first['href'] 
       end
-      
+
       pager do |doc|
         doc.css('p.nextprev a').select{|a| a.text =~ /next/i  }.first['href']
       end
-      
+
       before_paginate do
-        puts "page: #{self.source}"
+        puts "opening page: #{self.source}"
+        puts "collection size: #{self.collection.length}"
+        puts "#{"*"*100}"
       end
 
     end
 
     RedditEntry.source = 'http://reddit.com'
 
-    RedditEntry.all(:max_pages => 2).each do |p| 
+    RedditEntry.all(:max_pages => 5).each do |p| 
       puts "title: #{p.title}"
       puts "domain: #{p.domain}"
       puts "link: #{p.link}"
+      puts "#{"*"*100}"
     end
 
 ##Note on Patches/Pull Requests
