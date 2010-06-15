@@ -32,23 +32,26 @@ class WorkingPost
   end
 end
 
-class RedditEntry
+class PostWithPager
   include Graboid::Entity
 
-  selector '.entry'
-
+  selector '.post'
+  
   set :title
-  set :domain, :selector => '.domain a'
-  set :link,   :selector => '.title' do |entry| 
-    entry.css('a').first['href'] 
+  set :body
+  set :author
+  set :date, :selector => '.author' do |elm| 
+    elm.text.match(/\((.*)\)/)[1] 
   end
 
   pager do |doc|
-    doc.css('p.nextprev a').select{|a| a.text =~ /next/i  }.first['href']
+    link = 'http://localhost:9393'+doc.css('a.next').first['href'] rescue nil
+    #puts link.inspect
+    link
   end
 
   before_paginate do
-    puts "page: #{self.current_page}"
+    puts "page: #{self.source}"
   end
 
 end

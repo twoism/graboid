@@ -179,19 +179,27 @@ describe Graboid::Entity do
     end
   end  
   
-  if ENV['GRABOID_EXT']
-  
-    describe "#pager" do
+  describe "#pager" do
+    describe "with a limit" do
       before(:each) do
-        RedditEntry.source = 'http://reddit.com'
-        @posts = RedditEntry.all(:max_pages => 2)
+        PostWithPager.source = 'http://localhost:9393/posts'
+        @posts = PostWithPager.all(:max_pages => 3)
       end
-      it "should get 70 posts" do
-        @posts.length.should == 70
+      it "should get 2 posts" do
+        @posts.length.should == 6
+      end
+    end
+    
+    describe "without a limit" do
+      before(:each) do
+        PostWithPager.source = 'http://localhost:9393/posts'
+        @posts = PostWithPager.all
+      end
+      it "should get 2 posts" do
+        @posts.length.should == 16
       end
     end
     
   end
-  
-  
+    
 end

@@ -93,7 +93,11 @@ module Graboid
       end
       
       def next_page?
-        (current_page <= max_pages-1)
+        if max_pages.zero?
+          return true unless @pager.call(doc).nil?
+        else
+          current_page <= max_pages-1
+        end
       end
       
       def page_fragments
@@ -101,8 +105,15 @@ module Graboid
       end
       
       def all opts={}
+        reset_context
         self.max_pages = opts[:max_pages] if opts[:max_pages].present?
         all_fragments.collect{ |frag| extract_instance(frag) }
+      end
+      
+      def reset_context
+        self.collection   = []
+        self.current_page = 0
+        self.max_pages    = 0
       end
       
       def read_source
