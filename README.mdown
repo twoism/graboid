@@ -28,6 +28,10 @@
       pager do |doc|
         doc.css('p.nextprev a').select{|a| a.text =~ /next/i  }.first['href']
       end
+      
+      before_paginate do
+        puts "page: #{self.source}"
+      end
 
     end
 
