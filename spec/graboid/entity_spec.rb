@@ -143,17 +143,7 @@ describe Graboid::Entity do
   
   describe "#all" do
     before(:each) do
-      class WorkingPost
-        include Graboid::Entity
-        selector '.post'
-        set :title
-        set :body
-        set :author
-        set :date, :selector => '.author', :processor => lambda {|frag| frag.text.match(/\((.*)\)/)[1] }
-      end
-      
       WorkingPost.source = POSTS_HTML_STR
-      
     end
     
     it "should return 2 WorkingPosts" do
@@ -173,6 +163,21 @@ describe Graboid::Entity do
       end
     end
   end
+  
+  describe "#mode" do
+    it "should be html by default" do
+      WorkingPost.mode.should == :html
+    end
+    it "should throw an error for invalid values" do
+      lambda {
+        WorkingPost.mode = :derp
+      }.should raise_error ArgumentError
+    end
+    it "should change to :xml" do
+      WorkingPost.mode = :xml
+      WorkingPost.mode.should == :xml
+    end
+  end  
   
   if ENV['GRABOID_EXT']
   

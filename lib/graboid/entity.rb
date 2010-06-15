@@ -3,8 +3,9 @@ module Graboid
     
     def self.included klass
       klass.class_eval do
-        extend ClassMethods
+        extend  ClassMethods
         include InstanceMethods
+        
         write_inheritable_attribute(:attribute_map, {}) if attribute_map.nil?
       end
     end
@@ -43,7 +44,15 @@ module Graboid
       end
       
       def doc
-        Nokogiri::HTML read_source
+        eval "Nokogiri::#{self.mode.to_s.upcase}(read_source)"
+      end
+      
+      def collection
+        @collection ||= []
+      end
+      
+      def collection=(col)
+        @collection = col
       end
       
       def attribute_map
@@ -51,14 +60,14 @@ module Graboid
       end
       
       def extract_instance fragment
-        run_extract_callbacks
         new(hash_map(fragment))
       end
       
       def hash_map fragment
         attribute_map.inject({}) do |extracted_hash, at| 
           selector, processor       = at.last[:selector], at.last[:processor]
-          extracted_hash[at.first]  = processor.nil? ? fragment.css(selector).first.text : processor.call(fragment.css(selector).first) rescue ""
+          node_collection           = self.mode == :html ? fragment.css(selector) : fragment.xpath(selector)
+          extracted_hash[at.first]  = processor.nil? ? node_collection.first.text : processor.call(node_collection.first) rescue ""
 
           extracted_hash
         end
@@ -66,15 +75,15 @@ module Graboid
       
       def all_fragments
         return page_fragments if @pager.nil?
-        old_source  = self.source
-        @collection = []
+        old_source = self.source
         while next_page?
-          @collection += page_fragments
-          run_pagination_callbacks
+          self.collection += page_fragments
+          run_before_paginate_callbacks
           paginate
+          run_after_paginate_callbacks
         end
         self.source = old_source
-        @collection
+        self.collection
       end
       
       def paginate
@@ -98,7 +107,7 @@ module Graboid
       
       def read_source
         case self.source
-          when /^http:\/\//
+          when /^http[s]?:\/\//
             open self.source
           when String
             self.source
@@ -107,6 +116,15 @@ module Graboid
       
       def pager &block
         @pager = block
+      end
+      
+      def mode
+        @mode ||= :html
+      end
+      
+      def mode=(m)
+        raise ArgumentError unless [:html, :xml].include?(m)
+        @mode = m
       end
       
       def max_pages
@@ -125,20 +143,16 @@ module Graboid
         @current_page = num
       end
       
-      def run_pagination_callbacks
-        self.class_eval { @before_paginate.call } if @before_paginate
-      end
-      
-      def run_extract_callbacks
-        self.class_eval { @before_extract_instance.call } if @before_extract_instance
-      end
-      
       instance_eval do
         [:before, :after].each do |prefix|
           [:paginate, :extract].each do |suffix|
             method_name = "#{prefix}_#{suffix}"
-            define_method "#{prefix}_#{suffix}" do |&block|
+            define_method method_name.to_sym do |&block|
               instance_variable_set "@#{method_name}", block
+            end
+            define_method "run_#{method_name}_callbacks" do
+              ivar = instance_variable_get("@#{method_name}")
+              self.class_eval { ivar.call } unless ivar.nil?
             end
           end
         end 
