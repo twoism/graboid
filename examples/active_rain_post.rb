@@ -4,11 +4,21 @@ require File.join(dir, 'graboid')
 class ActiveRainPost
   include Graboid::Entity
 
-  root   '.blog_entry'
+  selector '.blog_entry_wrapper'
 
-  field :title, :selector => 'h2'
-
-  field :body, :selector => 'div' do |elm|
+  set :title, :selector => 'h2 a'
+  set :pub_date, :selector => '.blog_entry' do |elm|
+    # awesome, the pub date is not contained within 
+    # the .blog_entry_wrapper fragment.
+    begin
+      entry_id = elm['id'].gsub('blog_entry_','')
+      date_text = self.doc.css("#divbei#{entry_id} td").select{|td| td.text =~ /posted by/i }.first.text
+      date_text.match(/(\d{2}\/\d{2}\/\d{4})/).captures.first 
+    rescue
+      ""
+    end
+  end
+  set :body, :selector => 'div' do |elm|
     elm.css('p').collect(&:to_html)
   end
   
@@ -26,10 +36,10 @@ class ActiveRainPost
 end
 
 ActiveRainPost.source = 'http://activerain.com/blogs/elizabethweintraub'
-@posts  = ActiveRainPost.all
+@posts  = ActiveRainPost.all(:max_pages => 1)
 
 @posts.each do |post|
-  puts "#{post.title}"
+  puts "#{post.pub_date}"
   puts "*"*100
 end
 

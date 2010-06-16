@@ -5,7 +5,7 @@ module Graboid
       klass.class_eval do
         extend  ClassMethods
         include InstanceMethods
-        
+        warn "Deprecation Warning! Graboid::Entity - This module has been deprecated. See Graboid::Scraper."
         write_inheritable_attribute(:attribute_map, {}) if attribute_map.nil?
       end
     end
@@ -67,7 +67,7 @@ module Graboid
         attribute_map.inject({}) do |extracted_hash, at| 
           selector, processor       = at.last[:selector], at.last[:processor]
           node_collection           = self.mode == :html ? fragment.css(selector) : fragment.xpath(selector)
-          extracted_hash[at.first]  = processor.nil? ? node_collection.first.inner_html : processor.call(node_collection.first) rescue ""
+          extracted_hash[at.first]  = processor.nil? ? node_collection.first.inner_html : processor.call(node_collection.first) #rescue ""
 
           extracted_hash
         end
@@ -119,7 +119,7 @@ module Graboid
       def read_source
         case self.source
           when /^http[s]?:\/\//
-            open self.source
+            open(self.source, "User-Agent" => Graboid.user_agent)
           when String
             self.source
         end

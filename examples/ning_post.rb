@@ -1,7 +1,8 @@
-%w{rubygems graboid}.each {|f| require f }
+dir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+require File.join(dir, 'graboid')
 
 class NingPost
-  include Graboid::Entity
+  include Graboid::Scraper
 
   selector 'div.xg_blog .xg_module_body'
 
@@ -25,10 +26,10 @@ class NingPost
     # ning's list page only has an excerpt of the body. No biggie,
     # we'll just go grab it.
     show_url = elm.css('a').last["href"]
-    Nokogiri::HTML(open(show_url)).css('.postbody').to_html
+    Nokogiri::HTML(open(show_url,"User-Agent" => Graboid.user_agent)).css('.postbody').to_html
   end
   
-  pager do |doc|
+  page_with do |doc|
     doc.css('.pagination a').select{|a| a.text =~ /previous/i }.first['href'] rescue nil
   end
   
@@ -45,8 +46,8 @@ class NingPost
 
 end
 
-NingPost.source = 'http://cuwebd.ning.com/profiles/blog/list'
-@posts          = NingPost.all(:max_pages => 1)
+NING_URL = 'http://www.friendsorenemies.com/profiles/blog/list?user=3vx1daeuxrt14'
+@posts = NingPost.new( :source => NING_URL ).all(:max_pages => 2)
 
 @posts.each do |post|
   puts "#{post.pub_date} -- #{post.title}"
