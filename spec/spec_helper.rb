@@ -45,9 +45,7 @@ class PostWithPager
   end
 
   pager do |doc|
-    link = 'http://localhost:9393'+doc.css('a.next').first['href'] rescue nil
-    #puts link.inspect
-    link
+    'http://localhost:9393'+doc.css('a.next').first['href'] rescue nil
   end
 
   before_paginate do
