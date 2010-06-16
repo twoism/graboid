@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{graboid}
-  s.version = "0.3.2"
+  s.version = "0.3.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christopher Burnett"]
-  s.date = %q{2010-06-14}
+  s.date = %q{2010-06-15}
   s.description = %q{web scraping made easier}
   s.email = %q{signalstatic@gmail.com}
   s.extra_rdoc_files = [
@@ -23,6 +23,9 @@ Gem::Specification.new do |s|
      "README.mdown",
      "Rakefile",
      "VERSION",
+     "examples/active_rain_post.rb",
+     "examples/live_journal_post.rb",
+     "examples/ning_post.rb",
      "graboid.gemspec",
      "lib/graboid.rb",
      "lib/graboid/entity.rb",
@@ -44,7 +47,10 @@ Gem::Specification.new do |s|
     "spec/fixtures/server.rb",
      "spec/graboid/entity_spec.rb",
      "spec/graboid_spec.rb",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "examples/active_rain_post.rb",
+     "examples/live_journal_post.rb",
+     "examples/ning_post.rb"
   ]
 
   if s.respond_to? :specification_version then
