@@ -53,3 +53,5 @@ class PostWithPager
   end
 
 end
+
+TEST_SERVER_URL = 'http://localhost:9393/posts'

@@ -6,9 +6,14 @@ class LiveJournalPost
 
   root '.entrybox'
 
-  field :title,         :selector => '.caption a'
-  field :body,          :selector => 'td[@colspan="2"]'
-  field :comment_link,  :selector => '.caption a' do |elm|
+  field :title, :selector => '.caption a'
+  field :body,  :selector => 'td[@colspan="2"]'
+  
+  field :pub_date, :selector => 'td.index' do |elm|
+    elm.text.match(/\[(.*)\|/)[1]
+  end
+  
+  field :comment_link, :selector => '.caption a' do |elm|
     elm['href']
   end
   
@@ -25,11 +30,11 @@ class LiveJournalPost
 
 end
 
-LiveJournalPost.source = 'http://zeroplate.livejournal.com/'
-@posts  = LiveJournalPost.all(:max_pages => 3)
+LiveJournalPost.source  = 'http://zeroplate.livejournal.com/'
+@posts                  = LiveJournalPost.all(:max_pages => 3)
 
 @posts.each do |post|
-  puts "#{post.title}"
+  puts "#{post.pub_date} - #{post.title}"
   puts "#{post.comment_link}"
   puts "#{post.body}"
   puts "*"*100

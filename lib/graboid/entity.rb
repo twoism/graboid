@@ -67,7 +67,7 @@ module Graboid
         attribute_map.inject({}) do |extracted_hash, at| 
           selector, processor       = at.last[:selector], at.last[:processor]
           node_collection           = self.mode == :html ? fragment.css(selector) : fragment.xpath(selector)
-          extracted_hash[at.first]  = processor.nil? ? node_collection.first.inner_html : processor.call(node_collection.first) rescue ""
+          extracted_hash[at.first]  = processor.nil? ? node_collection.first.inner_html : processor.call(node_collection.first) #rescue ""
 
           extracted_hash
         end

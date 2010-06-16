@@ -3,6 +3,7 @@
 dir = Pathname(__FILE__).dirname.expand_path
 
 require dir + 'graboid/entity'
+require dir + 'graboid/scraper'
 
 
 module Graboid
