@@ -6,6 +6,7 @@ module Graboid
         include InstanceMethods
         
         write_inheritable_attribute(:attribute_map, {}) if attribute_map.nil?
+        write_inheritable_attribute(:callbacks, {})     if callbacks.nil?
       end
     end
     
@@ -13,6 +14,10 @@ module Graboid
       
       def attribute_map
         read_inheritable_attribute :attribute_map
+      end
+      
+      def callbacks
+        read_inheritable_attribute :callbacks
       end
       
       def inferred_selector
@@ -44,19 +49,13 @@ module Graboid
         attribute_map[name] = opts
       end
       
-      instance_eval do
-        [:before, :after].each do |prefix|
-          [:paginate, :extract].each do |suffix|
-            method_name = "#{prefix}_#{suffix}"
-            define_method method_name.to_sym do |&block|
-              instance_variable_set "@#{method_name}", block
-            end
-            define_method "run_#{method_name}_callbacks" do
-              ivar = instance_variable_get("@#{method_name}")
-              self.class_eval { ivar.call } unless ivar.nil?
-            end
+      [:before, :after].each do |prefix|
+        [:paginate, :extract].each do |suffix|
+          method_name = "#{prefix}_#{suffix}"
+          define_method method_name.to_sym do |&block|
+            self.callbacks["#{method_name}".to_sym] = block
           end
-        end 
+        end
       end
 
     end
@@ -73,14 +72,17 @@ module Graboid
         all_fragments.collect{ |frag| extract_instance(frag) }
       end
       
+      alias_method :scrape, :all
+      
       def all_fragments
         return page_fragments if self.class.pager.nil?
         old_source = self.source
+        
         while next_page?
           self.collection += page_fragments
-          #run_before_paginate_callbacks
+          run_before_paginate_callbacks
           paginate
-          #run_after_paginate_callbacks
+          run_after_paginate_callbacks
         end
         
         self.source = old_source
@@ -89,6 +91,10 @@ module Graboid
       
       def attribute_map
         self.class.attribute_map
+      end
+      
+      def callbacks
+        self.class.callbacks
       end
       
       def collection
@@ -176,6 +182,16 @@ module Graboid
       def source=(src)
         @source = src
       end
+      
+      [:before, :after].each do |prefix|
+        [:paginate, :extract].each do |suffix|
+          method_name = "#{prefix}_#{suffix}"
+          define_method "run_#{method_name}_callbacks" do
+            self.instance_eval &callbacks[method_name.to_sym] if callbacks[method_name.to_sym].present?
+          end
+        end
+      end
+      
     end
   end
 end

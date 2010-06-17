@@ -41,7 +41,7 @@ class ScraperWithPager
   end
 
   before_paginate do
-    puts "page: #{self.source}"
+    puts "page: #{source}"
   end
 
 end
@@ -191,9 +191,5 @@ describe Graboid::Scraper do
 
     end
     
-  end
-  
-  
-  
-  
+  end  
 end
