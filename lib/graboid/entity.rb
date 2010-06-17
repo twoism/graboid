@@ -119,7 +119,7 @@ module Graboid
       def read_source
         case self.source
           when /^http[s]?:\/\//
-            open self.source
+            open(self.source, "User-Agent" => Graboid.user_agent)
           when String
             self.source
         end
