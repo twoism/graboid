@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{graboid}
-  s.version = "0.3.3"
+  s.version = "0.3.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christopher Burnett"]
-  s.date = %q{2010-06-15}
+  s.date = %q{2010-06-16}
   s.description = %q{web scraping made easier}
   s.email = %q{signalstatic@gmail.com}
   s.extra_rdoc_files = [
@@ -29,11 +29,13 @@ Gem::Specification.new do |s|
      "graboid.gemspec",
      "lib/graboid.rb",
      "lib/graboid/entity.rb",
+     "lib/graboid/scraper.rb",
      "spec/fixtures/graboid.jpg",
      "spec/fixtures/posts.html",
      "spec/fixtures/server.rb",
      "spec/fixtures/views/posts.erb",
      "spec/graboid/entity_spec.rb",
+     "spec/graboid/scraper_spec.rb",
      "spec/graboid_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
@@ -46,6 +48,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/fixtures/server.rb",
      "spec/graboid/entity_spec.rb",
+     "spec/graboid/scraper_spec.rb",
      "spec/graboid_spec.rb",
      "spec/spec_helper.rb",
      "examples/active_rain_post.rb",
