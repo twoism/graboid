@@ -5,7 +5,7 @@ require 'spec'
 require 'spec/autorun'
 
 Spec::Runner.configure do |config|
-  
+  config.mock_with :mocha
 end
 
 FIXTURE_PATH    = File.expand_path(File.dirname(__FILE__)+'/fixtures/posts.html')

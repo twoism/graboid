@@ -172,16 +172,24 @@ describe Graboid::Scraper do
       describe "with a limit" do
         before(:each) do
           @scraper = ScraperWithPager.new( :source => 'http://localhost:9393/posts' )
+          @scraper.expects(:run_before_paginate_callbacks).times(3)
           @posts = @scraper.all(:max_pages => 3)
+        end
+        it "should set the callback" do
+          @scraper.callbacks[:before_paginate].should be_a Proc
         end
         it "should get 6 posts" do
           @posts.length.should == 6
         end
+        
+        
+        
       end
 
       describe "without a limit" do
         before(:each) do
           @scraper = ScraperWithPager.new( :source => 'http://localhost:9393/posts' )
+          @scraper.expects(:run_before_paginate_callbacks).times(8)
           @posts = @scraper.all
         end
         it "should get 16 posts" do
