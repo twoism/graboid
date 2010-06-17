@@ -4,6 +4,10 @@
 
   Simply awesome web scraping. Better docs later. See specs.
 
+### 0.3.4 Update ###
+
+[http://twoism.posterous.com/new-graboid-dsl](http://twoism.posterous.com/new-graboid-dsl, "New DSL")
+
 ### Installation ###
 
 
@@ -15,7 +19,7 @@
     %w{rubygems graboid}.each { |f| require f }
 
     class RedditEntry
-      include Graboid::Entity
+      include Graboid::Scraper
 
       selector '.entry'
 
@@ -26,7 +30,7 @@
         entry.css('a').first['href'] 
       end
 
-      pager do |doc|
+      page_with do |doc|
         doc.css('p.nextprev a').select{|a| a.text =~ /next/i  }.first['href']
       end
 
@@ -38,9 +42,9 @@
 
     end
 
-    RedditEntry.source = 'http://reddit.com'
+    @posts = RedditEntry.new( :source => 'http://reddit.com' ).all( :max_pages => 2 )
 
-    RedditEntry.all(:max_pages => 5).each do |p| 
+    @posts.each do |p| 
       puts "title: #{p.title}"
       puts "domain: #{p.domain}"
       puts "link: #{p.link}"
