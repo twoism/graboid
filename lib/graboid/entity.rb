@@ -5,7 +5,7 @@ module Graboid
       klass.class_eval do
         extend  ClassMethods
         include InstanceMethods
-        
+        warn "Deprecation Warning! Graboid::Entity - This module has been deprecated. See Graboid::Scraper."
         write_inheritable_attribute(:attribute_map, {}) if attribute_map.nil?
       end
     end

@@ -66,8 +66,9 @@ module Graboid
         self.source = opts[:source]
       end
       
-      def all opts={}
-        #reset_context
+      def all opts={}, reload=false
+        return self.collection if reload and !self.collection.empty?
+        reset_context
         self.max_pages = opts[:max_pages] if opts[:max_pages].present?
         all_fragments.collect{ |frag| extract_instance(frag) }
       end
@@ -173,6 +174,12 @@ module Graboid
           when String
             self.source
         end
+      end
+      
+      def reset_context
+        self.collection   = []
+        self.current_page = 0
+        self.max_pages    = 0
       end
       
       def source
