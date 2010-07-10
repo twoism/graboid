@@ -25,11 +25,9 @@ module Graboid
       end
       
       def page_with &block
-        @pager = block
-      end
-      
-      def pager
-        @pager
+        define_method :pager do
+          instance_eval &block
+        end
       end
       
       def root_selector
@@ -76,7 +74,8 @@ module Graboid
       alias_method :scrape, :all
       
       def all_fragments
-        return page_fragments if self.class.pager.nil?
+        return page_fragments unless self.respond_to?(:pager)
+        return page_fragments if self.pager(self.doc).nil?
         old_source = self.source
         
         while next_page?
@@ -151,10 +150,14 @@ module Graboid
       
       def next_page?
         if max_pages.zero?
-          return true unless self.class.pager.call(doc).nil?
+          return true unless self.pager(doc).nil?
         else
           current_page <= max_pages-1
         end
+      end
+      
+      def original_source
+        @original_source
       end
       
       def page_fragments
@@ -162,7 +165,7 @@ module Graboid
       end
       
       def paginate
-        next_page_url = self.class.pager.call(doc) rescue nil
+        next_page_url = self.pager(doc)
         self.source   = next_page_url
         self.current_page += 1
       end
@@ -182,11 +185,16 @@ module Graboid
         self.max_pages    = 0
       end
       
+      def host
+        self.source.scan(/http[s]?:\/\/.*\//).first
+      end
+      
       def source
         @source
       end
       
       def source=(src)
+        @original_source = src if @original_source.nil?
         @source = src
       end
       

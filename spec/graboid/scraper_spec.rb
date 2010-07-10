@@ -37,7 +37,7 @@ class ScraperWithPager
   end
 
   page_with do |doc|
-    'http://localhost:9393'+doc.css('a.next').first['href'] rescue nil
+    'http://localhost:9393'+self.doc.css('a.next').first['href'] rescue nil
   end
 
   before_paginate do
@@ -172,7 +172,7 @@ describe Graboid::Scraper do
       describe "with a limit" do
         before(:each) do
           @scraper = ScraperWithPager.new( :source => 'http://localhost:9393/posts' )
-          @scraper.expects(:run_before_paginate_callbacks).times(3)
+          #@scraper.expects(:run_before_paginate_callbacks).times(3)
           @posts = @scraper.all(:max_pages => 3)
         end
         it "should set the callback" do

@@ -9,7 +9,7 @@ module Graboid
   extend self
   
   def user_agent
-    @user_agent ||= 'Graboid'
+    @user_agent ||= 'Foo'
   end
   
   def user_agent=(agent)

@@ -35,8 +35,8 @@ class ActiveRainPost
 
 end
 
-ActiveRainPost.source = 'http://activerain.com/blogs/elizabethweintraub'
-@posts  = ActiveRainPost.all(:max_pages => 1)
+ActiveRainPost.source = 'http://activerain.com/blogs/danawilkinson'
+@posts  = ActiveRainPost.all(:max_pages => 100)
 
 @posts.each do |post|
   puts "#{post.pub_date}"

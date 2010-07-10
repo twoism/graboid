@@ -46,8 +46,8 @@ class NingPost
 
 end
 
-NING_URL = 'http://www.friendsorenemies.com/profiles/blog/list?user=3vx1daeuxrt14'
-@posts = NingPost.new( :source => NING_URL ).all(:max_pages => 2)
+NING_URL = 'http://vstar650.ning.com/profiles/blog/list'
+@posts = NingPost.new( :source => NING_URL ).all(:max_pages => 10)
 
 @posts.each do |post|
   puts "#{post.pub_date} -- #{post.title}"
