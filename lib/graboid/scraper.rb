@@ -1,19 +1,35 @@
 module Graboid
+  
   module Scraper
     def self.included klass
       klass.class_eval do
         extend  ClassMethods
         include InstanceMethods
-        
-        write_inheritable_attribute(:attribute_map, {}) if attribute_map.nil?
-        write_inheritable_attribute(:callbacks, {})     if callbacks.nil?
+
+        inherited_attributes :attribute_map, :callbacks
+        @attribute_map  = {}
+        @callbacks      = {}
       end
     end
-    
+
     module ClassMethods
-      
-      def attribute_map
-        read_inheritable_attribute :attribute_map
+
+      def inherited_attributes(*args)
+        @inherited_attributes ||= [:inherited_attributes]
+        @inherited_attributes += args
+        args.each do |arg|
+          class_eval %(
+            class << self; attr_accessor :#{arg} end
+          )
+        end
+        @inherited_attributes
+      end
+
+      def inherited(subclass)
+        @inherited_attributes.each do |inheritable_attribute|
+          instance_var = "@#{inheritable_attribute}"
+          subclass.instance_variable_set(instance_var, instance_variable_get(instance_var))
+        end
       end
       
       def callbacks
@@ -41,7 +57,7 @@ module Graboid
       alias_method :root, :selector
 
       def set name, opts={}, &block
-        opts.merge!(:selector   => ".#{name}")  unless opts[:selector].present?
+        opts.merge!(:selector   => ".#{name}")  if opts[:selector].nil?
         opts.merge!(:processor  => block)       if block_given?
         
         attribute_map[name] = opts
@@ -60,14 +76,14 @@ module Graboid
     
     module InstanceMethods
       def initialize opts={}, &block
-        raise ArgumentError unless opts[:source].present?
+        raise ArgumentError if opts[:source].nil?
         self.source = opts[:source]
       end
       
       def all opts={}, reload=false
         return self.collection if reload and !self.collection.empty?
         reset_context
-        self.max_pages = opts[:max_pages] if opts[:max_pages].present?
+        self.max_pages = opts[:max_pages] unless opts[:max_pages].nil?
         all_fragments.collect{ |frag| extract_instance(frag) }
       end
       
@@ -202,7 +218,7 @@ module Graboid
         [:paginate, :extract].each do |suffix|
           method_name = "#{prefix}_#{suffix}"
           define_method "run_#{method_name}_callbacks" do
-            self.instance_eval &callbacks[method_name.to_sym] if callbacks[method_name.to_sym].present?
+            self.instance_eval &callbacks[method_name.to_sym] unless callbacks[method_name.to_sym].nil?
           end
         end
       end
